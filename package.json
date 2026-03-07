@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-navigation-fork",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Strapi Navigation plugin fork — multi-language slug support, path structure customization, and import/export features",
   "strapi": {
     "name": "navigation",
