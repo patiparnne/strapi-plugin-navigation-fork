@@ -109,7 +109,7 @@ export const navigationItemAdditionalField = z.union([
 export const configContentTypeSchema = z.object({
   uid: z.string(),
   name: z.string(),
-  draftAndPublish: z.boolean(),
+  draftAndPublish: z.boolean().optional(),
   isSingle: z.boolean(),
   description: z.string(),
   collectionName: z.string(),
@@ -117,9 +117,10 @@ export const configContentTypeSchema = z.object({
   label: z.string(),
   labelSingular: z.string(),
   endpoint: z.string(),
-  available: z.boolean(),
+  available: z.boolean().optional(),
   visible: z.boolean(),
-});
+  attributes: z.record(z.string(), z.unknown()).optional(),
+}).passthrough();
 
 export const configSchema = z.object({
   additionalFields: z.array(navigationItemAdditionalField),
@@ -131,9 +132,10 @@ export const configSchema = z.object({
       name: z.string(),
       key: z.string(),
     })
+    .passthrough()
     .array(),
   contentTypes: z.array(z.string()),
-  defaultContentType: z.string().optional(),
+  defaultContentType: z.string().optional().catch(undefined),
   contentTypesNameFields: z.record(z.string(), z.array(z.string())),
   contentTypesPopulate: z.record(z.string(), z.array(z.string())),
   gql: z.object({
@@ -144,9 +146,10 @@ export const configSchema = z.object({
   preferCustomContentTypes: z.boolean(),
   allowedContentTypes: z.string().array(),
   restrictedContentTypes: z.string().array(),
+  contentTypesSchemas: z.record(z.string(), z.record(z.string(), z.unknown())).optional(),
   isCacheEnabled: z.boolean().optional(),
   isCachePluginEnabled: z.boolean().optional(),
-});
+}).passthrough();
 
 export type ConfigFromServerSchema = z.infer<typeof configFromServerSchema>;
 export const configFromServerSchema = configSchema

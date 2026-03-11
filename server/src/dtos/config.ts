@@ -17,6 +17,7 @@ export type ConfigContentTypeDTO = {
   endpoint: string;
   plugin: string | undefined;
   visible: boolean;
+  attributes: Record<string, unknown>;
 };
 
 export type NavigationPluginConfigDTO = Pick<
@@ -34,6 +35,7 @@ export type NavigationPluginConfigDTO = Pick<
   contentTypesNameFields: {
     default: typeof CONTENT_TYPES_NAME_FIELDS_DEFAULTS;
   } & Record<string, string[]>;
+  contentTypesSchemas: Record<string, Record<string, unknown>>;
   isGQLPluginEnabled: boolean | undefined;
   isCachePluginEnabled: boolean | undefined;
   isCacheEnabled: boolean | undefined;

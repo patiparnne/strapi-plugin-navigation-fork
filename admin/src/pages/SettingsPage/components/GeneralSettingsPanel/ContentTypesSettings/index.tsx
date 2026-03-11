@@ -5,13 +5,14 @@ import { useIntl } from 'react-intl';
 import { get, isEmpty } from 'lodash';
 
 import { getTrad } from '../../../../../translations';
-import { useContentTypes } from '../../../hooks';
+import { useConfig, useContentTypes } from '../../../hooks';
 import { useSettingsContext } from '../../../context';
 
 const ALLOWED_POPULATE_TYPES = ['relation', 'media', 'component', 'dynamiczone'];
 
 export const ContentTypesSettings = () => {
   const contentTypesQuery = useContentTypes();
+  const configQuery = useConfig();
 
   const { formatMessage } = useIntl();
 
@@ -22,22 +23,27 @@ export const ContentTypesSettings = () => {
     contentTypesNameFields: contentTypeNameFieldsCurrent,
   } = values;
 
+  const configContentTypes = configQuery.data?.contentTypeItems;
+
   return (
     <Grid.Item col={12} s={12} xs={12}>
       {contentTypesCurrent?.length ? (
         <Accordion.Root style={{ width: '100%' }}>
           {contentTypeNameFieldsCurrent.map((nameFields, index) => {
             const current = contentTypesQuery.data?.find(({ uid }) => uid === nameFields.key);
-            const attributes = current?.attributes ?? ({} as Record<string, any>);
+            const configCT = configContentTypes?.find((ct) => ct.uid === nameFields.key);
+            const displayName = configCT?.label || current?.info.displayName;
+            const schemaAttrs = configQuery.data?.contentTypesSchemas?.[nameFields.key];
+            const attributes = (schemaAttrs ?? configCT?.attributes ?? current?.attributes ?? {}) as Record<string, any>;
             const attributeKeys = Object.keys(attributes).sort();
             const allowedFieldsToPopulate = attributeKeys.filter((key) =>
               ALLOWED_POPULATE_TYPES.includes(attributes[key]?.type)
             );
-            return current ? (
+            return (current || configCT) ? (
               <Accordion.Item key={nameFields.key} value={nameFields.key}>
                 <Accordion.Header>
                   <Accordion.Trigger>
-                    {current?.info.displayName ??
+                    {displayName ??
                       formatMessage(getTrad('pages.settings.form.nameField.default'))}
                   </Accordion.Trigger>
                 </Accordion.Header>

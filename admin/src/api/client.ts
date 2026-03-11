@@ -114,11 +114,12 @@ export const getApiClient = once((fetch: ReturnType<typeof getFetchClient>) => (
       return {
         ...fromServer,
         contentTypes: fromServer.contentTypes.map(({ uid }) => uid),
+        contentTypeItems: fromServer.contentTypes,
       };
     });
   },
   readSettingsConfigIndex() {
-    return [URL_PREFIX, 'config'];
+    return [URL_PREFIX, 'settings', 'config'];
   },
 
   readContentType() {

@@ -104,15 +104,7 @@ export const contentTypeRelationAttribute = z.object({
 export type ContentTypeAttributes = z.infer<typeof contentTypeAttributes>;
 export const contentTypeAttributes = z.record(
   z.string(),
-  z.union([
-    simpleContentTypeAttribute,
-    contentTypeEnumerationAttribute,
-    contentTypeComponentAttribute,
-    contentTypeDynamicZoneAttribute,
-    contentTypeRelationAttribute,
-    contentTypeMediaAttribute,
-    contentTypeUidAttribute,
-  ])
+  z.object({ type: z.string().optional() }).passthrough()
 );
 
 export type ContentTypeFullSchema = z.infer<typeof contentTypeFullSchema>;
@@ -126,6 +118,7 @@ export const contentTypeFullSchema = z.object({
       hidden: z.boolean().optional(),
       templateName: z.string().optional(),
     })
+    .passthrough()
     .optional(),
   attributes: contentTypeAttributes,
   actions: z.record(z.string(), z.any()).optional(),
@@ -145,7 +138,7 @@ export const contentTypeFullSchema = z.object({
   plugin: z.string().optional(),
   pluginOptions: z.record(z.string(), z.any()).optional(),
   isSingle: z.boolean().optional(),
-});
+}).passthrough();
 
 export type ContentTypeSchema = z.infer<typeof contentTypeFullSchema>;
 export const contentTypeSchema = contentTypeFullSchema.pick({

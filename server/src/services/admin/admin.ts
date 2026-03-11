@@ -121,9 +121,18 @@ const adminService = (context: { strapi: Core.Strapi }) => ({
       };
     }
 
+    const contentTypesSchemas: Record<string, Record<string, unknown>> = {};
+    for (const uid of config.contentTypes) {
+      const ct = context.strapi.contentTypes[uid as any] as any;
+      if (ct?.attributes) {
+        contentTypesSchemas[uid] = ct.attributes;
+      }
+    }
+
     return {
       ...result,
       ...extendedResult,
+      contentTypesSchemas,
       isCacheEnabled: cacheStatus.enabled,
       isCachePluginEnabled: cacheStatus.hasCachePlugin,
     };
@@ -246,6 +255,8 @@ const adminService = (context: { strapi: Core.Strapi }) => ({
         name ||
         upperFirst(relationNameParts.length > 1 ? relationNameParts.join(' ') : relationName);
 
+      const rawAttributes = (context.strapi.contentTypes[key as any] as any)?.attributes ?? {};
+
       acc.push({
         uid,
         name: relationName,
@@ -262,6 +273,7 @@ const adminService = (context: { strapi: Core.Strapi }) => ({
         available: isAvailable,
         visible,
         templateName: options?.templateName,
+        attributes: rawAttributes,
       });
 
       return acc;
