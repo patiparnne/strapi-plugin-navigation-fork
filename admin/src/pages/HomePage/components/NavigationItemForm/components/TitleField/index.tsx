@@ -22,7 +22,7 @@ export const TitleField = () => {
       >
         <TextInput
           type="string"
-          disabled={!canUpdate || (values.autoSync && values.type === 'INTERNAL')}
+          disabled={!canUpdate}
           name="title"
           onChange={(eventOrPath: FormChangeEvent, value?: any) =>
             handleChange(eventOrPath, value, onChange)

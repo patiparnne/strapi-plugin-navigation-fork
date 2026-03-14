@@ -37,6 +37,7 @@ export const RelatedTypeField: React.FC<RelatedTypeFieldProps> = ({
   const {
     canUpdate,
     isLoading,
+    onChange,
     renderError,
     setFormValueItem,
     values: formValues,
@@ -102,20 +103,32 @@ export const RelatedTypeField: React.FC<RelatedTypeFieldProps> = ({
       >
         <ControllableCombobox
           name="relatedType"
-          onClear={() =>
+          onClear={() => {
             setFormValuesItems({
               related: undefined,
               relatedType: undefined,
               title: formValues.autoSync ? '' : formValues.title,
-            })
-          }
-          onChange={(eventOrPath: FormChangeEvent) =>
+            });
+            // Sync Form internal state
+            onChange('relatedType', undefined);
+            onChange('related', undefined);
+            if (formValues.autoSync) {
+              onChange('title', '');
+            }
+          }}
+          onChange={(eventOrPath: FormChangeEvent) => {
             setFormValuesItems({
               related: undefined,
               relatedType: eventOrPath,
               title: formValues.autoSync ? '' : formValues.title,
-            })
-          }
+            });
+            // Sync Form internal state
+            onChange('relatedType', eventOrPath);
+            onChange('related', undefined);
+            if (formValues.autoSync) {
+              onChange('title', '');
+            }
+          }}
           value={currentRelatedType}
           options={relatedTypeSelectOptions}
           disabled={!configQuery.data?.contentTypes.length || !canUpdate}

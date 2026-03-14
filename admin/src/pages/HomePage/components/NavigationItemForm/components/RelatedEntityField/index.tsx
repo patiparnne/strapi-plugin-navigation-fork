@@ -37,6 +37,8 @@ export const RelatedEntityField: React.FC<RelatedEntityFieldProps> = ({
   const { canUpdate, isLoading, handleChange, onChange, renderError } =
     useNavigationItemFormContext();
 
+  useChangeFieldsFromRelated(values, contentTypeItems, setFormValuesItems, onChange);
+
   const relatedSelectOptions = sortBy(
     contentTypeItems?.map((item) => {
       const label = appendLabelPublicationStatus(
@@ -61,8 +63,6 @@ export const RelatedEntityField: React.FC<RelatedEntityFieldProps> = ({
   );
 
   const thereAreNoMoreContentTypes = isEmpty(relatedSelectOptions);
-
-  useChangeFieldsFromRelated(values, contentTypeItems, setFormValuesItems);
 
   if (!values.relatedType || isSingleSelected) {
     return null;
