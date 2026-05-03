@@ -15,7 +15,12 @@ import {
   PluginConfigPathDefaultFields,
   PluginConfigPopulate,
 } from '../types';
-import { assertNotEmpty, resolveGlobalLikeId, validateAdditionalFields } from '../utils';
+import {
+  assertNotEmpty,
+  resolveGlobalLikeId,
+  sanitizeContentTypesPopulate,
+  validateAdditionalFields,
+} from '../utils';
 
 type PluginDefaultConfigGetter = (
   key: PluginConfigKeys
@@ -63,6 +68,7 @@ export const configSetup = async ({
   };
 
   handleDeletedContentTypes(config, { strapi });
+  sanitizeContentTypesPopulate(config, { strapi });
 
   validateAdditionalFields(config.additionalFields);
 
@@ -104,6 +110,18 @@ const handleDeletedContentTypes = (
 
   config.contentTypesNameFields = Object.fromEntries(
     Object.entries(config.contentTypesNameFields).filter(
+      ([contentType]) => !notAvailableContentTypes.includes(contentType)
+    )
+  );
+
+  config.contentTypesPopulate = Object.fromEntries(
+    Object.entries(config.contentTypesPopulate).filter(
+      ([contentType]) => !notAvailableContentTypes.includes(contentType)
+    )
+  );
+
+  config.pathDefaultFields = Object.fromEntries(
+    Object.entries(config.pathDefaultFields).filter(
       ([contentType]) => !notAvailableContentTypes.includes(contentType)
     )
   );

@@ -37,6 +37,8 @@ import {
   getPluginModels,
   getPluginService,
   isContentTypeEligible,
+  sanitizeContentTypePopulateFields,
+  sanitizeContentTypesPopulate,
   singularize,
   validateAdditionalFields,
 } from '../../utils';
@@ -605,6 +607,7 @@ const adminService = (context: { strapi: Core.Strapi }) => ({
       .then(DynamicSchemas.configSchema.parse);
 
     validateAdditionalFields(newConfig.additionalFields);
+    sanitizeContentTypesPopulate(newConfig, context);
 
     await pluginStore.set({ key: 'config', value: newConfig });
 
@@ -759,7 +762,7 @@ const adminService = (context: { strapi: Core.Strapi }) => ({
     try {
       const contentTypeItems = await repository.findMany(
         where,
-        config.contentTypesPopulate[uid] || [],
+        sanitizeContentTypePopulateFields(context, uid, config.contentTypesPopulate[uid] || []),
         draftAndPublish ? 'published' : undefined
       );
 

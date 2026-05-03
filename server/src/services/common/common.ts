@@ -27,6 +27,7 @@ import {
   NavigationActionsCategories,
   NavigationActionsPerItem,
 } from '../../types';
+import { sanitizeContentTypePopulateFields } from '../../utils';
 import {
   AnalyzeBranchInput,
   BuildNestedStructureInput,
@@ -78,7 +79,11 @@ const commonService = (context: { strapi: Core.Strapi }) => ({
           return item;
         }
 
-        const fieldsToPopulate = config.contentTypesPopulate[item.related.__type];
+        const fieldsToPopulate = sanitizeContentTypePopulateFields(
+          context,
+          item.related.__type,
+          config.contentTypesPopulate[item.related.__type]
+        );
 
         const repository = getGenericRepository({ strapi }, item.related.__type as UID.ContentType);
 

@@ -155,6 +155,70 @@ describe('Navigation', () => {
           expect(result.contentTypes).not.toContain(deletedContentType);
         });
 
+        it('should cleanup deleted content type populate and path settings', async () => {
+          // Given
+          const activeContentType = 'api::active.active';
+          const deletedContentType = 'api::deleted.deleted';
+
+          getContentTypes.mockReturnValue({
+            [activeContentType]: { attributes: {} },
+          });
+
+          getStore.mockReturnValue({
+            contentTypes: [activeContentType, deletedContentType],
+            contentTypesNameFields: {
+              [activeContentType]: ['title'],
+              [deletedContentType]: ['title'],
+            },
+            contentTypesPopulate: {
+              [activeContentType]: [],
+              [deletedContentType]: ['image'],
+            },
+            pathDefaultFields: {
+              [activeContentType]: ['slug'],
+              [deletedContentType]: ['slug'],
+            },
+          });
+          getFromConfig.mockReturnValue({});
+
+          // When
+          const result = await configSetup({ strapi });
+
+          // Then
+          expect(result.contentTypesPopulate).not.toHaveProperty(deletedContentType);
+          expect(result.pathDefaultFields).not.toHaveProperty(deletedContentType);
+        });
+
+        it('should remove invalid populate fields for existing content types', async () => {
+          // Given
+          const contentType = 'api::brand.brand';
+
+          getContentTypes.mockReturnValue({
+            [contentType]: {
+              attributes: {
+                name: { type: 'string' },
+                images: { type: 'string' },
+                preview: { type: 'media' },
+                tags: { type: 'relation' },
+              },
+            },
+          });
+
+          getStore.mockReturnValue({
+            contentTypes: [contentType],
+            contentTypesPopulate: {
+              [contentType]: ['images', 'preview', 'tags.name'],
+            },
+          });
+          getFromConfig.mockReturnValue({});
+
+          // When
+          const result = await configSetup({ strapi });
+
+          // Then
+          expect(result.contentTypesPopulate[contentType]).toEqual(['preview', 'tags.name']);
+        });
+
         // TODO: test `validateAdditionalFields`
         it.todo('should check if custom fields config is valid');
 

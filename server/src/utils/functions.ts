@@ -152,6 +152,43 @@ export const parsePopulateQuery = (populate: any) => {
   }
 };
 
+const POPULATABLE_ATTRIBUTE_TYPES = ['relation', 'media', 'component', 'dynamiczone'];
+
+const getPopulateRootField = (field: string) => field.split('.')[0];
+
+export const sanitizeContentTypePopulateFields = (
+  { strapi }: { strapi: Core.Strapi },
+  uid: string,
+  fields: string[] = []
+) => {
+  const attributes = strapi.contentTypes[uid as any]?.attributes;
+
+  if (!attributes) {
+    return [];
+  }
+
+  const populatableFields = new Set(
+    Object.entries(attributes)
+      .filter(([, attribute]: [string, any]) =>
+        POPULATABLE_ATTRIBUTE_TYPES.includes(attribute?.type)
+      )
+      .map(([key]) => key)
+  );
+
+  return fields.filter((field) => populatableFields.has(getPopulateRootField(field)));
+};
+
+export const sanitizeContentTypesPopulate = (
+  config: NavigationPluginConfigDBSchema,
+  { strapi }: { strapi: Core.Strapi }
+) => {
+  config.contentTypesPopulate = Object.fromEntries(
+    Object.entries(config.contentTypesPopulate ?? {})
+      .filter(([uid]) => !!strapi.contentTypes[uid as any])
+      .map(([uid, fields]) => [uid, sanitizeContentTypePopulateFields({ strapi }, uid, fields)])
+  );
+};
+
 export const isContentTypeEligible = (uid = '') => {
   const isOneOfAllowedType = !!ALLOWED_CONTENT_TYPES.find((_) => uid.includes(_));
   const isNoneOfRestricted = !RESTRICTED_CONTENT_TYPES.find((_) => uid.includes(_) || uid === _);
